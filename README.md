@@ -196,3 +196,7 @@ I’d advise to follow the `Array` behavior for 3 reasons:
 In [`Array.prototype.filter()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), it is mentioned that the returned array is a shallow copy. And in arrays again, new arrays are already created. And the same happens when using `Object.fromEntries(Object.entries(object))`
 
 So I think those return new objects that don’t extend from the original prototype.
+
+### What about collisions with other libraries?
+
+In ECMAScript, except for the spread operator mentioned earlier, those shouldn’t collide with anything in the current specification. But in the past, APIs were picked to avoid collisions with older libraries mutating the global polyfills. For example `Array.prototype.flatten()` was renamed `.flat()` to avoid collisions with MooTools, see https://developer.chrome.com/blog/smooshgate.
