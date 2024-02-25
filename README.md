@@ -200,3 +200,26 @@ So I think those return new objects that don’t extend from the original protot
 ### What about collisions with other libraries?
 
 In ECMAScript, except for the spread operator mentioned earlier, those shouldn’t collide with anything in the current specification. But in the past, APIs were picked to avoid collisions with older libraries mutating the global polyfills. For example `Array.prototype.flatten()` was renamed `.flat()` to avoid collisions with MooTools, see https://developer.chrome.com/blog/smooshgate.
+
+In this case, MooTools shouldn’t be an issue as they add:
+- Object.prototype.getFromPath
+- Object.prototype.cleanValues
+- Object.prototype.erase
+- Object.prototype.run
+- Object.each
+- Object.merge
+- Object.clone
+- Object.append
+- Object.subset
+- Object.map
+- Object.filter
+- Object.every
+- Object.some
+- Object.keys
+- Object.values
+- Object.getLength
+- Object.keyOf
+- Object.contains
+- Object.toQueryString
+
+This is another reason to implement those as `object.map(callbackFn)` and not `Object.map(object, callbackFn)`.
