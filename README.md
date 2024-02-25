@@ -31,6 +31,7 @@ This proposal comes in 2 new additions:
   - `.forEach()`
   - `.filter()`
   - `.map()`
+  - `.reduce()`
   - `.some()`
   - `.every()`
  
@@ -110,7 +111,7 @@ map(callbackFn, thisArg)
   - `key`\
     The key of the current entry being processed in the object.
   - `object`\
-     The object `forEach()` was called upon.
+     The object `map()` was called upon.
 - `thisArg` (Optional)\
   A value to use as `this` when executing `callbackFn`
 
@@ -152,7 +153,7 @@ filter(callbackFn, thisArg)
   - `key`\
     The key of the current entry being processed in the object.
   - `object`\
-     The object `forEach()` was called upon.
+     The object `filter()` was called upon.
 - `thisArg` (Optional)\
   A value to use as `this` when executing `callbackFn`
 
@@ -175,6 +176,61 @@ console.log(newObject)
 // { foo: 1 }
 ```
 
+### `.reduce()`
+
+To mimic iterators & arrays, `Object.prototype.reduce()` can be added:
+
+```js
+reduce(callbackFn)
+reduce(callbackFn, initialValue)
+```
+
+#### Signature
+
+**Parameters:**
+- `callbackFn`\
+  A function to execute for each entry in the object. Its return value becomes the value of the `accumulator` parameter on the next invocation of `callbackFn`. For the last invocation, the return value becomes the return value of `reduce()`. The function is called with the following arguments:
+  - `accumulator`\
+    The value resulting from the previous call to `callbackFn`. On the first call, its value is `initialValue` if the latter is specified; otherwise its value is `Object.values(object)[0]`.
+  - `currentValue`\
+    The current value of the entry being processed in the object.
+  - `currentKey`\
+    The key of the current entry being processed in the object.
+  - `object`\
+     The object `reduce()` was called upon.
+- `initialValue` (Optional)\
+  A value to which `accumulator` is initialized the first time the callback is called. If `initialValue` is specified, `callbackFn` starts executing with the first value in the object as `currentValue`. If `initialValue` is not specified, `accumulator` is initialized to the first value in the object, and `callbackFn` starts executing with the second value in the object as `currentValue`. In this case, if the object is empty (so that there’s no first value to return as `accumulator`), an error is thrown.
+
+**Return value:** The value that results from running the "reducer" callback function to completion over the entire object.
+
+#### Example
+
+```js
+const object = { foo: 1, bar: 2 };
+
+const max = object.reduce((accumulator, currentValue, currentKey, reference) => {
+  console.log({ accumulator, currentValue, currentKey });
+  return Math.max(accumulator, currentValue);
+})
+
+// Would log:
+// { accumulator: 1, currentValue: 2, currentKey: 'bar' }
+
+console.log(max);
+// 2
+
+
+
+object.reduce((accumulator, currentValue, currentKey, reference) => {
+  console.log({ accumulator, currentValue });
+  return Math.max(accumulator, currentValue);
+}, -Infinity)
+
+// Would log:
+// { accumulator: -Infinity, currentValue: 1, currentKey: 'foo' }
+// { accumulator: 1, currentValue: 2, currentKey: 'bar' }
+```
+
 ### `.some()`
 
 To mimic iterators & arrays, `Object.prototype.some()` can be added:
@@ -194,7 +250,7 @@ some(callbackFn, thisArg)
   - `key`\
     The key of the current entry being processed in the object.
   - `object`\
-     The object `forEach()` was called upon.
+     The object `some()` was called upon.
 - `thisArg` (Optional)\
   A value to use as `this` when executing `callbackFn`
 
@@ -247,7 +303,7 @@ every(callbackFn, thisArg)
   - `key`\
     The key of the current entry being processed in the object.
   - `object`\
-     The object `forEach()` was called upon.
+     The object `every()` was called upon.
 - `thisArg` (Optional)\
   A value to use as `this` when executing `callbackFn`
 
@@ -330,7 +386,3 @@ In this case, MooTools shouldn’t be an issue as they add:
 - `Object.toQueryString`
 
 This is another reason to implement those as `object.map(callbackFn)` and not `Object.map(object, callbackFn)`.
-
-### Why not `.reduce()` or `.flatMap()`?
-
-TO FILL
