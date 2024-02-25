@@ -31,7 +31,9 @@ This proposal comes in 2 new additions:
   - `.forEach()`
   - `.filter()`
   - `.map()`
-  - ... TO FILL
+  - `.some()` TO FILL
+  - `.every()` TO FILL
+  - `.some()` TO FILL
  
 > [!Note]
 > Those 2 could be split in 2 different proposals
@@ -202,24 +204,28 @@ So I think those return new objects that don’t extend from the original protot
 In ECMAScript, except for the spread operator mentioned earlier, those shouldn’t collide with anything in the current specification. But in the past, APIs were picked to avoid collisions with older libraries mutating the global polyfills. For example `Array.prototype.flatten()` was renamed `.flat()` to avoid collisions with MooTools, see https://developer.chrome.com/blog/smooshgate.
 
 In this case, MooTools shouldn’t be an issue as they add:
-- Object.prototype.getFromPath
-- Object.prototype.cleanValues
-- Object.prototype.erase
-- Object.prototype.run
-- Object.each
-- Object.merge
-- Object.clone
-- Object.append
-- Object.subset
-- Object.map
-- Object.filter
-- Object.every
-- Object.some
-- Object.keys
-- Object.values
-- Object.getLength
-- Object.keyOf
-- Object.contains
-- Object.toQueryString
+- `Object.prototype.getFromPath`
+- `Object.prototype.cleanValues`
+- `Object.prototype.erase`
+- `Object.prototype.run`
+- `Object.each`
+- `Object.merge`
+- `Object.clone`
+- `Object.append`
+- `Object.subset`
+- `Object.map`
+- `Object.filter`
+- `Object.every`
+- `Object.some`
+- `Object.keys`
+- `Object.values`
+- `Object.getLength`
+- `Object.keyOf`
+- `Object.contains`
+- `Object.toQueryString`
 
 This is another reason to implement those as `object.map(callbackFn)` and not `Object.map(object, callbackFn)`.
+
+### Why not `.reduce()` or `.flatMap()`?
+
+TO FILL
