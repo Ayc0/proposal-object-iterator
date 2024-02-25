@@ -31,9 +31,8 @@ This proposal comes in 2 new additions:
   - `.forEach()`
   - `.filter()`
   - `.map()`
-  - `.some()` TO FILL
-  - `.every()` TO FILL
-  - `.some()` TO FILL
+  - `.some()`
+  - `.every()`
  
 > [!Note]
 > Those 2 could be split in 2 different proposals
@@ -174,6 +173,112 @@ const newObject = object.filter((value, key, reference) => {
 
 console.log(newObject)
 // { foo: 1 }
+```
+
+### `.some()`
+
+To mimic iterators & arrays, `Object.prototype.some()` can be added:
+
+```js
+some(callbackFn)
+some(callbackFn, thisArg)
+```
+
+#### Signature
+
+**Parameters:**
+- `callbackFn`\
+  A function to execute for each element in the object. It should return a [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) to indicate the entry passes the test, and a [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) value otherwise. The function is called with the following arguments:
+  - `value`\
+    The current value of the entry being processed in the object.
+  - `key`\
+    The key of the current entry being processed in the object.
+  - `object`\
+     The object `forEach()` was called upon.
+- `thisArg` (Optional)\
+  A value to use as `this` when executing `callbackFn`
+
+**Return value:** `false` unless `callbackFn` returns a [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) value for an object entry, in which case `true` is immediately returned.
+
+#### Example
+
+```js
+const object = { foo: 1, bar: '2' };
+
+const doesContainNumber = object.some((value, key, reference) => {
+  console.log(value, key, reference);
+  return typeof value === 'number';
+})
+// Would log:
+// 1   'foo' { foo: 1, bar: '2' }
+// the 2nd isn’t logged as it immediatly stops as the 1st matched
+
+console.log(doesContainNumber);
+// true
+
+const doesContainArray = object.some((value, key, reference) => {
+  console.log(value, key, reference);
+  return Array.isArray(value);
+})
+// Would log:
+// 1   'foo' { foo: 1, bar: '2' }
+// '2' 'bar' { foo: 1, bar: '2' }
+
+console.log(doesContainArray);
+// false
+```
+
+### `.every()`
+
+To mimic iterators & arrays, `Object.prototype.every()` can be added:
+
+```js
+every(callbackFn)
+every(callbackFn, thisArg)
+```
+
+#### Signature
+
+**Parameters:**
+- `callbackFn`\
+  A function to execute for each element in the object. It should return a [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) valueto indicate the entry passes the test, and a [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) value otherwise. The function is called with the following arguments:
+  - `value`\
+    The current value of the entry being processed in the object.
+  - `key`\
+    The key of the current entry being processed in the object.
+  - `object`\
+     The object `forEach()` was called upon.
+- `thisArg` (Optional)\
+  A value to use as `this` when executing `callbackFn`
+
+**Return value:** `true` unless `callbackFn` returns a [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) value for an object entry, in which case `false` is immediately returned.
+
+#### Example
+
+```js
+const object = { foo: 1, bar: '2' };
+
+const doesOnlyIncludeString = object.every((value, key, reference) => {
+  console.log(value, key, reference);
+  return typeof value === 'string';
+})
+// Would log:
+// 1   'foo' { foo: 1, bar: '2' }
+// the 2nd isn’t logged as it immediatly stops as the 1st doesn’t match
+
+console.log(doesOnlyIncludeString);
+// false
+
+const doesOnlyIncludeNumberLike = object.every((value, key, reference) => {
+  console.log(value, key, reference);
+  return !Number.isNaN(Number(value));
+})
+// Would log:
+// 1   'foo' { foo: 1, bar: '2' }
+// '2' 'bar' { foo: 1, bar: '2' }
+
+console.log(doesOnlyIncludeNumberLike);
+// true
 ```
 
 ## Open questions
