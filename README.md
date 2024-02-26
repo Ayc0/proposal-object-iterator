@@ -12,62 +12,38 @@ This proposal is at Stage 0 of [The TC39 Process](https://tc39.es/process-docume
 
 ## Motivation
 
-Currently in ECMAScript, you can use `for..of` with `Array`s, `Set`s, `Map`s, `Iterator`s, but not `Object`s.
-Also, `Array`s (and soon `Iterator`s, see [proposal](https://github.com/tc39/proposal-iterator-helpers)) have `.forEach()`, `.map()`, `.filter()` methods.
-
-Iterating over & manipulating `Object`s is also a bit tedious at the moment in ECMAScript. We also need to use `Object.keys(obj)`, `Object.values(obj)`, or `Object.entries(obj)`.
-And if we want to create a new object from an previous one with the same keys, only a modification of its values, we need to write:
+Currently in ECMAScript, iterating over & manipulating `Object`s is also a bit tedious at the moment in ECMAScript. We need to use `Object.keys(obj)`, `Object.values(obj)`, or `Object.entries(obj)` and chain them. So if we want to create a new object from an previous one with the same keys, only a modification of its values, we need to write:
 ```js
 Object.fromEntries(Object.entries(object).map(([key, value]) => [key, transformation(value)])
 ```
+This is a bit verbose.
 
-Those could be made simpler.
+Manipulating objects could be made simpler.
 
 ## Proposal
 
-> This proposal was mentioned as being "not web compatible". It’ll be re-written to drop the iterable aspect, and move all methods as static methods on `Object` instead.
+This proposal comes in new static methods to the `Object` class:
+- `Object.forEach()`
+- `Object.filter()`
+- `Object.map()`
+- `Object.reduce()`
+- `Object.some()`
+- `Object.every()`
 
-This proposal comes in 2 new additions:
-- ~~making objects iterable,~~ 
-- adding new methods to the object ~~prototype~~ static methods:
-  - `.forEach()`
-  - `.filter()`
-  - `.map()`
-  - `.reduce()`
-  - `.some()`
-  - `.every()`
- 
-> [!Note]
-> Those 2 could be split in 2 different proposals
+### `Object.forEach()`
 
-### Iterable
-
-To follow `Map`’s iterator (see [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/@@iterator)), `Object`s could behave in a similar manner:
+To mimic iterators & arrays, `Object.forEach()` can be added:
 
 ```js
-for (const entry of object) {
-  const key = entry[0];
-  const value = entry[1];
-}
-```
-
-With:
-- `entry` behind the same thing as what `Object.entries(object)` returns: an array of 2 elements with the key & the value,
-- the order of iteration respecting the existing order in object,
-- just like `Object.entries(…)`, `for .. of` would wollow the own keys of objects and not follow the prototype
-
-### `.forEach()`
-
-To mimic iterators & arrays, `Object.prototype.forEach()` can be added:
-
-```js
-forEach(callbackFn)
-forEach(callbackFn, thisArg)
+Object.forEach(obj, callbackFn)
+Object.forEach(obj, callbackFn, thisArg)
 ```
 
 #### Signature
 
 **Parameters:**
+- `obj`\
+  An object.
 - `callbackFn`\
   A function to execute for each element in the array. Its return value is discarded. The function is called with the following arguments:
   - `value`\
@@ -84,9 +60,9 @@ forEach(callbackFn, thisArg)
 #### Example
 
 ```js
-const object = { foo: 1, bar: '2' };
+const obj = { foo: 1, bar: '2' };
 
-object.forEach((value, key, reference) => {
+Object.forEach(obj, (value, key, reference) => {
   console.log(value, key, reference);
 })
 // Would log:
@@ -94,18 +70,20 @@ object.forEach((value, key, reference) => {
 // '2' 'bar' { foo: 1, bar: '2' }
 ```
 
-### `.map()`
+### `Object.map()`
 
-To mimic iterators & arrays, `Object.prototype.map()` can be added:
+To mimic iterators & arrays, `Object.map()` can be added:
 
 ```js
-map(callbackFn)
-map(callbackFn, thisArg)
+Object.map(obj, callbackFn)
+Object.map(obj, callbackFn, thisArg)
 ```
 
 #### Signature
 
 **Parameters:**
+- `obj`\
+  An object.
 - `callbackFn`\
   A function to execute for each element in the object. Its return value is used as the value of a new single entry in the new object. The function is called with the following arguments:
   - `value`\
@@ -122,9 +100,9 @@ map(callbackFn, thisArg)
 #### Example
 
 ```js
-const object = { foo: 1, bar: 2 };
+const obj = { foo: 1, bar: 2 };
 
-const newObject = object.map((value, key, reference) => {
+const newObject = Object.map(obj, (value, key, reference) => {
   console.log(value, key, reference);
   return value * 3
 })
@@ -136,18 +114,20 @@ console.log(newObject)
 // { foo: 3, bar: 6 }
 ```
 
-### `.filter()`
+### `Object.filter()`
 
-To mimic iterators & arrays, `Object.prototype.filter()` can be added:
+To mimic iterators & arrays, `Object.filter()` can be added:
 
 ```js
-filter(callbackFn)
-filter(callbackFn, thisArg)
+Object.filter(obj, callbackFn)
+Object.filter(obj, callbackFn, thisArg)
 ```
 
 #### Signature
 
 **Parameters:**
+- `obj`\
+  An object.
 - `callbackFn`\
   A function to execute for each element in the object. It should return a [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) value to keep the element in the resulting object, and a [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) value otherwise. The function is called with the following arguments:
   - `value`\
@@ -164,9 +144,9 @@ filter(callbackFn, thisArg)
 #### Example
 
 ```js
-const object = { foo: 1, bar: '2' };
+const obj = { foo: 1, bar: '2' };
 
-const newObject = object.filter((value, key, reference) => {
+const newObject = Object.filter(obj, (value, key, reference) => {
   console.log(value, key, reference);
   return typeof value === 'number'
 })
@@ -180,16 +160,18 @@ console.log(newObject)
 
 ### `.reduce()`
 
-To mimic iterators & arrays, `Object.prototype.reduce()` can be added:
+To mimic iterators & arrays, `Object.reduce()` can be added:
 
 ```js
-reduce(callbackFn)
-reduce(callbackFn, initialValue)
+Object.reduce(obj, callbackFn)
+Object.reduce(obj, callbackFn, initialValue)
 ```
 
 #### Signature
 
 **Parameters:**
+- `obj`\
+  An object.
 - `callbackFn`\
   A function to execute for each entry in the object. Its return value becomes the value of the `accumulator` parameter on the next invocation of `callbackFn`. For the last invocation, the return value becomes the return value of `reduce()`. The function is called with the following arguments:
   - `accumulator`\
@@ -208,9 +190,9 @@ reduce(callbackFn, initialValue)
 #### Example
 
 ```js
-const object = { foo: 1, bar: 2 };
+const obj = { foo: 1, bar: 2 };
 
-const max = object.reduce((accumulator, currentValue, currentKey, reference) => {
+const max = Object.reduce(obj, (accumulator, currentValue, currentKey, reference) => {
   console.log({ accumulator, currentValue, currentKey });
   return Math.max(accumulator, currentValue);
 })
@@ -223,7 +205,7 @@ console.log(max);
 
 
 
-object.reduce((accumulator, currentValue, currentKey, reference) => {
+Object.reduce(obj, (accumulator, currentValue, currentKey, reference) => {
   console.log({ accumulator, currentValue });
   return Math.max(accumulator, currentValue);
 }, -Infinity)
@@ -233,18 +215,20 @@ object.reduce((accumulator, currentValue, currentKey, reference) => {
 // { accumulator: 1, currentValue: 2, currentKey: 'bar' }
 ```
 
-### `.some()`
+### `Object.some()`
 
-To mimic iterators & arrays, `Object.prototype.some()` can be added:
+To mimic iterators & arrays, `Object.some()` can be added:
 
 ```js
-some(callbackFn)
-some(callbackFn, thisArg)
+Object.some(obj, callbackFn)
+Object.some(obj, callbackFn, thisArg)
 ```
 
 #### Signature
 
 **Parameters:**
+- `obj`\
+  An object.
 - `callbackFn`\
   A function to execute for each element in the object. It should return a [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) to indicate the entry passes the test, and a [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) value otherwise. The function is called with the following arguments:
   - `value`\
@@ -261,9 +245,9 @@ some(callbackFn, thisArg)
 #### Example
 
 ```js
-const object = { foo: 1, bar: '2' };
+const obj = { foo: 1, bar: '2' };
 
-const doesContainNumber = object.some((value, key, reference) => {
+const doesContainNumber = Object.some(obj, (value, key, reference) => {
   console.log(value, key, reference);
   return typeof value === 'number';
 })
@@ -274,7 +258,7 @@ const doesContainNumber = object.some((value, key, reference) => {
 console.log(doesContainNumber);
 // true
 
-const doesContainArray = object.some((value, key, reference) => {
+const doesContainArray = Object.some(obj, (value, key, reference) => {
   console.log(value, key, reference);
   return Array.isArray(value);
 })
@@ -288,16 +272,18 @@ console.log(doesContainArray);
 
 ### `.every()`
 
-To mimic iterators & arrays, `Object.prototype.every()` can be added:
+To mimic iterators & arrays, `Object.every()` can be added:
 
 ```js
-every(callbackFn)
-every(callbackFn, thisArg)
+Object.every(obj, callbackFn)
+Object.every(obj, callbackFn, thisArg)
 ```
 
 #### Signature
 
 **Parameters:**
+- `obj`\
+  An object.
 - `callbackFn`\
   A function to execute for each element in the object. It should return a [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) valueto indicate the entry passes the test, and a [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) value otherwise. The function is called with the following arguments:
   - `value`\
@@ -314,9 +300,9 @@ every(callbackFn, thisArg)
 #### Example
 
 ```js
-const object = { foo: 1, bar: '2' };
+const obj = { foo: 1, bar: '2' };
 
-const doesOnlyIncludeString = object.every((value, key, reference) => {
+const doesOnlyIncludeString = Object.every(obj, (value, key, reference) => {
   console.log(value, key, reference);
   return typeof value === 'string';
 })
@@ -327,7 +313,7 @@ const doesOnlyIncludeString = object.every((value, key, reference) => {
 console.log(doesOnlyIncludeString);
 // false
 
-const doesOnlyIncludeNumberLike = object.every((value, key, reference) => {
+const doesOnlyIncludeNumberLike = Object.every(obj, (value, key, reference) => {
   console.log(value, key, reference);
   return !Number.isNaN(Number(value));
 })
@@ -341,14 +327,23 @@ console.log(doesOnlyIncludeNumberLike);
 
 ## Open questions
 
-### Can objects be considered as iterables without having an effect on the spread operator?
+### Why not trying to make objects iterables?
 
-We still want `[...object]` to throw, and `{...object}` to create a shallow copy without prototype of `object`
+Modifying `Object`’s prototype to add a `[@@iterator]()` method would also make all classes that extend from `Object` iterable. This will have side effects, so it can be dangerous.
+Also some classes like `WeakSet` do extend `Object` but we **don’t** want to make them iterable.
+
+So we can **not** make them iterable.
+
+### Why adding those as static methods and not as functions on the prototype?
+
+For the same reason as making them iterable, if `Object.prototype.forEach()` was added, we could do `new WeakSet().forEach()` that:
+- wouldn’t behave as expected (as `Object.keys(new WeakSet([{}]))` returns `[]`),
+- should **not** work as `WeakSet` shouldn’t be iterable.
 
 ### Why this signature for `.forEach()` (and other)?
 
-When adding `Object.prototype.forEach`, it could behave in 2 ways:
-- either as a shorthand for `Object.entries(object).forEach()` with `object.forEach((entry, index, objectReference) => {  })`,
+When adding `Object.forEach`, it could behave in 2 ways:
+- either as a shorthand for `Object.entries(object).forEach(([key, value], index, objectReference) => {})`,
 - or similarly to `Array.prototype.forEach((value, key, objectReference) => {  })`
 
 I’d advise to follow the `Array` behavior for 3 reasons:
@@ -356,7 +351,7 @@ I’d advise to follow the `Array` behavior for 3 reasons:
 2. why would anyone need the `index`? Also `index` doesn’t make sense for objects
 3. if it were a shorthand for `Object.entries(object).forEach()`, the last argument should be the output of `Object.entries(object)`, so an array of entries, and not the `objectReference` itself. So even in the best scenario, it wouldn’t be a drop-in replacement for `Object.entries(object).forEach()`
 
-### Should `.map()`, `.filter()`, and others re-use the original prototype or strat from 0?
+### Should `Object.map()`, `Object.filter()`, and others re-use the original prototype or strat from 0?
 
 In [`Array.prototype.filter()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), it is mentioned that the returned array is a shallow copy. And in arrays again, new arrays are already created. And the same happens when using `Object.fromEntries(Object.entries(object))`
 
@@ -366,20 +361,18 @@ So I think those return new objects that don’t extend from the original protot
 
 In ECMAScript, except for the spread operator mentioned earlier, those shouldn’t collide with anything in the current specification. But in the past, APIs were picked to avoid collisions with older libraries mutating the global polyfills. For example `Array.prototype.flatten()` was renamed `.flat()` to avoid collisions with MooTools, see https://developer.chrome.com/blog/smooshgate.
 
-In this case, MooTools shouldn’t be an issue as they add:
-- `Object.prototype.getFromPath`
-- `Object.prototype.cleanValues`
+In this case, MooTools adds:
 - `Object.prototype.erase`
 - `Object.prototype.run`
-- `Object.each`
+- `Object.each` <- not the same name as `Object.forEach`
 - `Object.merge`
 - `Object.clone`
 - `Object.append`
 - `Object.subset`
-- `Object.map`
-- `Object.filter`
-- `Object.every`
-- `Object.some`
+- `Object.map`    <- conflicts
+- `Object.filter` <- conflicts
+- `Object.every`  <- conflicts
+- `Object.some`   <- conflicts
 - `Object.keys`
 - `Object.values`
 - `Object.getLength`
@@ -387,4 +380,54 @@ In this case, MooTools shouldn’t be an issue as they add:
 - `Object.contains`
 - `Object.toQueryString`
 
-This is another reason to implement those as `object.map(callbackFn)` and not `Object.map(object, callbackFn)`.
+But when you check how they are implemented ([see doc](https://mootools.net/core/docs/1.6.0/Types/Object#Object:Object-map)):
+
+<details><summary>Expand to see the extract from the docs</summary>
+
+> **[Function: Object.map](https://mootools.net/core/docs/1.6.0/Types/Object#Object:Object-map)**
+> 
+> Creates a new map with the results of calling a provided function on every value in the map.
+> 
+> **Syntax:**
+> 
+> ```js
+> var mappedObject = Object.map(object, fn[, bind]);
+> ```
+> 
+> **Arguments:**
+> 
+> 1.  object - (_object_) The object.
+> 2.  fn - (_function_) The function to produce an element of the Object from an element of the current one.
+> 3.  bind - (_object_, optional) The object to use as 'this' in the function. For more information see [Function:bind](https://mootools.net/core/docs/1.6.0/Types/Function#Function:bind).
+> 
+> **Argument: fn**
+> 
+> **Syntax:**
+> 
+> ```js
+> fn(value, key, object)
+> ```
+> 
+> **Arguments:**
+> 
+> 1.  value - (_mixed_) The current value in the object.
+> 2.  key - (_string_) The current value's key in the object.
+> 3.  object - (_object_) The actual object.
+> 
+> **Returns:**
+> 
+> -   (_object_) The new mapped object.
+> 
+> **Examples:**
+> 
+> ```js
+> var myObject = {a: 1, b: 2, c: 3};
+> var timesTwo = Object.map(myObject, function(value, key){
+>     return value * 2;
+> }); // timesTwo now holds an object containing: {a: 2, b: 4, c: 6};
+> ```
+
+</details>
+
+This is the exact same API & output. And same for the 3 other functions. So it shouldn’t break any MooTools website.
+
