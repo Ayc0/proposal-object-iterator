@@ -325,7 +325,7 @@ console.log(doesOnlyIncludeNumberLike);
 // true
 ```
 
-## Open questions
+## QnA
 
 ### Why not trying to make objects iterables?
 
@@ -431,3 +431,24 @@ But when you check how they are implemented ([see doc](https://mootools.net/core
 
 This is the exact same API & output. And same for the 3 other functions. So it shouldn’t break any MooTools website.
 
+### Why this proposal? Everything is already doable without
+
+Indeed, all of those can already be done without. But they’re a bit verbose at the moment, and they create a few temporary arrays (1 for the `Object.entries`, + 1 for each entry) which is not ideal for performances:
+
+```js
+// With the current ECMAScript spec:
+Object.entries(obj).forEach(([key, value]) => callbackFn(value, key, obj));
+Object.fromEntries(Object.entries(obj).map(([key, value]) => callbackFn(value, key, obj)));
+Object.entries(obj).reduce((accumulator, [key, value]) => callbackFn(accumulator, value, key, obj), initialValue);
+Object.entries(obj).some(([key, value]) => callbackFn(value, key, obj));
+Object.entries(obj).every(([key, value]) => callbackFn(value, key, obj));
+
+// With this proposal:
+Object.forEach(obj, callbackFn);
+Object.map(obj, callbackFn);
+Object.reduce(callbackFn, initialValue);
+Object.some(callbackFn);
+Object.every(callbackFn);
+```
+
+The new code is simpler, and if the internals are optimized, it should also be more performant for the end user.
