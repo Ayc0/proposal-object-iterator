@@ -25,9 +25,11 @@ Those could be made simpler.
 
 ## Proposal
 
+> This proposal was mentioned as being "not web compatible". It’ll be re-written to drop the iterable aspect, and move all methods as static methods on `Object` instead.
+
 This proposal comes in 2 new additions:
-- making objects iterable,
-- adding new methods to the object prototype:
+- ~~making objects iterable,~~ 
+- adding new methods to the object ~~prototype~~ static methods:
   - `.forEach()`
   - `.filter()`
   - `.map()`
