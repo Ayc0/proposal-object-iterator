@@ -45,7 +45,7 @@ Object.forEach(obj, callbackFn, thisArg)
 - `obj`\
   An object.
 - `callbackFn`\
-  A function to execute for each element in the array. Its return value is discarded. The function is called with the following arguments:
+  A function to execute for each entry in the object. Its return value is discarded. The function is called with the following arguments:
   - `value`\
     The current value of the entry being processed in the object.
   - `key`\
