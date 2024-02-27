@@ -12,7 +12,7 @@ This proposal is at Stage 0 of [The TC39 Process](https://tc39.es/process-docume
 
 ## Motivation
 
-Currently in ECMAScript, iterating over & manipulating `Object`s is also a bit tedious at the moment in ECMAScript. We need to use `Object.keys(obj)`, `Object.values(obj)`, or `Object.entries(obj)` and chain them. So if we want to create a new object from an previous one with the same keys, only a modification of its values, we need to write:
+Currently in ECMAScript, iterating over & manipulating Objects is a bit tedious. We need to use `Object.keys(obj)`, `Object.values(obj)`, or `Object.entries(obj)` and chain them. For example, if we want to create a new object from an previous one with the same keys, and only transform its values, we need to write:
 ```js
 Object.fromEntries(Object.entries(object).map(([key, value]) => [key, transformation(value)])
 ```
@@ -452,3 +452,9 @@ Object.every(callbackFn);
 ```
 
 The new code is simpler, and if the internals are optimized, it should also be more performant for the end user.
+
+### Which order should be used for iterating over objects?
+
+For a long time, objects in ECMAScript didn’t have a stable traversal order and it was up to implementations to decide what to do. But this has changed in recent years. To quote [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in#description):
+
+> The traversal order, as of modern ECMAScript specification, is well-defined and consistent across implementations. Within each component of the prototype chain, all non-negative integer keys (those that can be array indices) will be traversed first in ascending order by value, then other string keys in ascending chronological order of property creation.
