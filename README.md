@@ -458,3 +458,5 @@ The new code is simpler, and if the internals are optimized, it should also be m
 For a long time, objects in ECMAScript didn’t have a stable traversal order and it was up to implementations to decide what to do. But this has changed in recent years. To quote [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...in#description):
 
 > The traversal order, as of modern ECMAScript specification, is well-defined and consistent across implementations. Within each component of the prototype chain, all non-negative integer keys (those that can be array indices) will be traversed first in ascending order by value, then other string keys in ascending chronological order of property creation.
+
+Those rules are respected by `for..in`, `Object.keys()`, `Object.values()`, and `Object.entries()`. So the same logic can be applied to the new methods too.
