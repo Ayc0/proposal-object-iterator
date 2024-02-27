@@ -351,7 +351,7 @@ I’d advise to follow the `Array` behavior for 3 reasons:
 2. why would anyone need the `index`? Also `index` doesn’t make sense for objects
 3. if it were a shorthand for `Object.entries(object).forEach()`, the last argument should be the output of `Object.entries(object)`, so an array of entries, and not the `objectReference` itself. So even in the best scenario, it wouldn’t be a drop-in replacement for `Object.entries(object).forEach()`
 
-### Should `Object.map()`, `Object.filter()`, and others re-use the original prototype or strat from 0?
+### Should `Object.map()`, `Object.filter()`, and others re-use the original prototype or start from zero?
 
 In [`Array.prototype.filter()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), it is mentioned that the returned array is a shallow copy. And in arrays again, new arrays are already created. And the same happens when using `Object.fromEntries(Object.entries(object))`
 
